@@ -94,28 +94,7 @@ def xn(
     Raises:
         TypeError: If the decorated function passed is not a `Callable`.
     """
-
-    def intermediate_wrapper(_func: Callable[P, RVXN]) -> LazyExecNode[P, RVXN]:
-        lazy_exec_node: LazyExecNode[P, RVXN] = LazyExecNode(
-            exec_function=_func,
-            priority=priority,
-            is_sequential=is_sequential,
-            debug=debug,
-            tag=tag,
-            setup=setup,
-            unpack_to=unpack_to,
-            resource=resource,
-        )
-        functools.update_wrapper(lazy_exec_node, _func)
-        return lazy_exec_node
-
-    # case #1: arguments are provided to the decorator
-    if func is None:
-        return intermediate_wrapper
-    # case #2: no argument is provided to the decorator
-    if not callable(func):
-        raise TypeError(f"{func} is not a callable. Did you use a non-keyword argument?")
-    return intermediate_wrapper(func)
+    pass
 
 
 @overload
@@ -200,21 +179,4 @@ def dag(
     Raises:
         TypeError: If the decorated object is not a Callable.
     """
-
-    # wrapper used to support parametrized and non parametrized decorators
-    def intermediate_wrapper(_func: Callable[P, RVDAG]) -> Union[DAG[P, RVDAG], AsyncDAG[P, RVDAG]]:
-        # 0. Protect against multiple threads declaring many DAGs at the same time
-        d = threadsafe_make_dag(_func, max_concurrency, is_async)
-        functools.update_wrapper(d, _func)
-        return d
-
-    # case 1: arguments are provided to the decorator
-    if declare_dag_function is None:
-        # return a decorator
-        return intermediate_wrapper
-    # case 2: arguments aren't provided to the decorator
-    if not callable(declare_dag_function):
-        raise TypeError(
-            f"{declare_dag_function} is not a callable. Did you use a non-keyword argument?"
-        )
-    return intermediate_wrapper(declare_dag_function)
+    pass

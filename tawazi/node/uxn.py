@@ -50,17 +50,7 @@ class UsageExecNode:
         Returns:
             Any: value inside the container
         """
-        # ignore typing error because it is the responsibility of the user to ensure the result of the XN is indexable!
-        # Will raise the appropriate exception automatically
-        #  The user might have specified a subgraph to run => xn contain NoVal
-        #  or the user tried to access a non-indexable object
-        # NOTE: maybe handle the 3 types of exceptions that might occur properly to help the user through debugging
-        # if isinstance(xn.result, NoValType):
-        #     raise TawaziTypeError(f"{xn} didn't run, hence its result is not indexable. Check your DAG's config")
-
-        if self.id in results:
-            return reduce(lambda obj, key: obj.__getitem__(key), self.key, results[self.id])
-        return None
+        pass
 
     def __bool__(self) -> NoReturn:
         """__bool__ operator."""

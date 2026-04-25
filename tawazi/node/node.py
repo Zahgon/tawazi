@@ -67,12 +67,7 @@ def count_occurrences(id_: str, exec_nodes: dict[str, "ExecNode"]) -> int:
     Returns:
         int: the number of occurrences of id_ in exec_nodes
     """
-    # only choose the ids that are exactly exactly the same as the original id
-    candidate_ids = (xn_id for xn_id in exec_nodes if xn_id.split(USE_SEP_START)[0] == id_)
-
-    # count the number of ids that are exactly the same as the original id
-    #  or that end with USE_SEP_END (which means they come from a reuse of the same ExecNode)
-    return sum(xn_id == id_ or xn_id.endswith(USE_SEP_END) for xn_id in candidate_ids)
+    pass
 
 
 @dataclass(frozen=True)
@@ -185,12 +180,12 @@ class ExecNode:
 
     def executed(self, results: dict[Identifier, Any]) -> bool:
         """Returns whether this ExecNode was executed or not."""
-        return self.id in results
+        pass
 
     @property
     def id(self) -> Identifier:
         """The identifier of this ExecNode."""
-        return self.id_
+        pass
 
     # TODO: make it cached_property because once this property is read, it should'nt be changed
     @property
@@ -200,16 +195,7 @@ class ExecNode:
         Returns:
             List[UsageExecNode]: the List of ExecNode dependencies of This ExecNode.
         """
-        # Making the dependencies
-        # 1. from args
-        deps = self.args.copy()
-        # 2. and from kwargs
-        deps.extend(self.kwargs.values())
-        # 3. and from active
-        if self.active is not None:
-            deps.append(self.active)
-
-        return deps
+        pass
 
     def execute(self, results: dict[Identifier, Any], profiles: dict[Identifier, Profile]) -> Any:
         """Execute the ExecNode inside of a DAG.
@@ -221,60 +207,14 @@ class ExecNode:
         Returns:
             the result of the execution of the current ExecNode
         """
-        logger.debug("Start executing {} with task {}", self.id, self.exec_function)
-        profiles[self.id] = Profile(cfg.TAWAZI_PROFILE_ALL_NODES)
-
-        # 1. prepare args and kwargs for usage:
-        args = [uxn.result(results) for uxn in self.args]
-        kwargs = {
-            # kwarg might be executed in a dag in dag "which will contain "."
-            key.split(".")[-1]: uxn.result(results)
-            for key, uxn in self.kwargs.items()
-            if key not in RESERVED_KWARGS
-        }
-
-        # 1. pre-
-        # 1.1 prepare the profiling
-        with profiles[self.id]:
-            # 2 post-
-            # 2.1 write the result
-            try:
-                results[self.id] = self.exec_function(*args, **kwargs)
-            except Exception:
-                if self.call_location:
-                    logger.warning(
-                        f"Error occurred while executing ExecNode {self.id} at {self.call_location}"
-                    )
-                raise
-
-        # 3. useless return value
-        logger.debug("Finished executing {} with task {}", self.id, self.exec_function)
-        return results[self.id]
+        pass
 
     def get_call_location(self) -> str:
         """Get Location where ExecNode was called."""
-        frame = inspect.currentframe()
-        # Traverse back the specified number of frames
-        if frame is None:
-            return ""
-        for _ in range(self.call_location_frame):
-            frame = frame.f_back
-            if frame is None:
-                return ""
-
-        frame_info = inspect.getframeinfo(frame)
-        return f"{frame_info.filename}:{frame_info.lineno}"
+        pass
 
     def _conf_to_values(self, conf: dict[str, Any]) -> dict[str, Any]:
-        values = dataclasses.asdict(self)
-        # copy the values of ExecNode that are also dataclass
-        values["args"] = self.args
-        values["kwargs"] = self.kwargs
-        values["active"] = self.active
-        # modify the values of ExecNode that should be modified
-        values["is_sequential"] = conf.get("is_sequential", self.is_sequential)
-        values["priority"] = conf.get("priority", self.priority)
-        return values  # ignore: typing[no-any-return]
+        pass
 
 
 class ReturnExecNode(ExecNode):
@@ -297,12 +237,7 @@ class ReturnExecNode(ExecNode):
         Raises:
             TypeError: if type parameter is passed (Internal)
         """
-        suffix = make_suffix(name_or_order)
-        return ReturnExecNode(
-            id_=f"{func}{RETURN_NAME_SEP}{suffix}",
-            is_sequential=False,
-            resource=Resource.main_thread,
-        )
+        pass
 
 
 class ArgExecNode(ExecNode):
@@ -347,8 +282,7 @@ def make_axn_id(id_: Identifier, name_or_order: Union[str, int]) -> Identifier:
     Returns:
         Identifier: Id of the ArgExecNode
     """
-    suffix = make_suffix(name_or_order)
-    return f"{id_}{ARG_NAME_SEP}{suffix}"
+    pass
 
 
 class LazyExecNode(ExecNode, Generic[P, RVXN]):
@@ -419,20 +353,7 @@ class LazyExecNode(ExecNode, Generic[P, RVXN]):
 
     def _validate_dependencies(self) -> None:
         # only validate dependencies if the exec_nodes_lock is locked
-        if not exec_nodes_lock.locked():
-            return
-        for dep in self.dependencies:
-            # if ExecNode is not a debug node, all its dependencies must not be debug node
-            if not self.debug and exec_nodes[dep.id].debug:
-                raise TawaziError(f"Non debug node {self} depends on debug node {dep}")
-
-            # if ExecNode is a setup node, all its dependencies should be either:
-            # 1. setup nodes
-            # 2. Constants (ArgExecNode)
-            # 3. Arguments passed directly to the PipeLine (ArgExecNode)
-            accepted_case = exec_nodes[dep.id].setup or isinstance(exec_nodes[dep.id], ArgExecNode)
-            if self.setup and not accepted_case:
-                raise TawaziError(f"setup node {self} depends on non setup node {dep}")
+        pass
 
     @property
     def _usage_exec_node(self) -> Union[tuple[UsageExecNode, ...], UsageExecNode]:
@@ -443,9 +364,7 @@ class LazyExecNode(ExecNode, Generic[P, RVXN]):
         but multiple UsageExecNode instances hang around in the dag.
         However, they might relate to the same ExecNode.
         """
-        if self.unpack_to is None:
-            return UsageExecNode(self.id)
-        return tuple(UsageExecNode(self.id, key=[i]) for i in range(self.unpack_to))
+        pass
 
     def __get__(self, instance: "LazyExecNode[P, RVXN]", owner_cls: Optional[Any] = None) -> Any:
         """Simulate func_descr_get() in Objects/funcobject.c.
@@ -470,55 +389,21 @@ def make_default_value_uxn(
     id_: Identifier, name_or_order: Union[str, int], default_value: Any
 ) -> UsageExecNode:
     """Make a default ArgExecNode and its corresponding UsageExecNode."""
-    xn = ArgExecNode(make_axn_id(id_, name_or_order))
-    exec_nodes[xn.id] = xn
-    results[xn.id] = default_value
-    return UsageExecNode(xn.id)
+    pass
 
 
 def make_args(id_: Identifier, *args: P.args, **kwargs: P.kwargs) -> list[UsageExecNode]:  # type: ignore[valid-type]
     """Constructs the positional arguments for an ExecNode."""
-    xn_args = []
-
-    # *args can contain either:
-    #  1. UsageExecNode corresponding to the dependencies that come from predecessors
-    #  2. or non ExecNode values which are constants passed directly to the
-    #  LazyExecNode.__call__ (eg. strings, int, etc.)
-    for i, arg in enumerate(args):
-        if not isinstance(arg, UsageExecNode):
-            # arg here is definitely not a return value of a LazyExecNode!
-            # it must be a default value
-            arg = make_default_value_uxn(id_, i, arg)
-
-        xn_args.append(arg)
-    return xn_args
+    pass
 
 
 def make_kwargs(
     id_: Identifier, *args: P.args, **kwargs: P.kwargs  # type: ignore[valid-type]
 ) -> dict[Identifier, UsageExecNode]:
     """Constructs the keyword arguments for an ExecNode."""
-    xn_kwargs = {}
-    # **kwargs contain either
-    #  1. UsageExecNode corresponding to the dependencies that come from predecessors
-    #  2. or non ExecNode values which are constants passed directly to the
-    #  3. or Reserved Keyword Arguments for Tawazi. These are used to assign different values per LXN call
-    for kwarg_name, kwarg in kwargs.items():
-        if kwarg_name in [ARG_NAME_TAG, ARG_NAME_UNPACK_TO, ARG_NAME_ACTIVATE]:
-            continue
-        if not isinstance(kwarg, UsageExecNode):
-            # passed in constants
-            kwarg = make_default_value_uxn(id_, kwarg_name, kwarg)
-
-        xn_kwargs[kwarg_name] = kwarg
-    return xn_kwargs
+    pass
 
 
 def make_active(id_: Identifier, *args: P.args, **kwargs: P.kwargs) -> Optional[UsageExecNode]:  # type: ignore[valid-type]
     """Constructs the active argument for an ExecNode."""
-    if ARG_NAME_ACTIVATE not in kwargs:
-        return None
-    active: Union[UsageExecNode, Any] = kwargs[ARG_NAME_ACTIVATE]
-    if not isinstance(active, UsageExecNode):
-        return make_default_value_uxn(id_, ARG_NAME_ACTIVATE, active)
-    return active
+    pass

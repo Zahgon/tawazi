@@ -10,48 +10,39 @@ from .uxn import UsageExecNode
 
 
 def _xn(func: Callable[P, RVXN]) -> LazyExecNode[P, RVXN]:
-    return LazyExecNode(
-        exec_function=func,
-        priority=0,
-        is_sequential=cfg.TAWAZI_IS_SEQUENTIAL,
-        debug=False,
-        tag=None,
-        setup=False,
-        unpack_to=None,
-        resource=cfg.TAWAZI_DEFAULT_RESOURCE,
-    )
+    pass
 
 
 # boolean operators definitions
 # "rich comparison" methods definitions
 @_xn
 def _lt(a: Any, b: Any) -> bool:
-    return a < b  # type: ignore[no-any-return]
+    pass
 
 
 @_xn
 def _le(a: Any, b: Any) -> bool:
-    return a <= b  # type: ignore[no-any-return]
+    pass
 
 
 @_xn
 def _eq(a: Any, b: Any) -> bool:
-    return a == b  # type: ignore[no-any-return]
+    pass
 
 
 @_xn
 def _ne(a: Any, b: Any) -> bool:
-    return a != b  # type: ignore[no-any-return]
+    pass
 
 
 @_xn
 def _gt(a: Any, b: Any) -> bool:
-    return a > b  # type: ignore[no-any-return]
+    pass
 
 
 @_xn
 def _ge(a: Any, b: Any) -> bool:
-    return a >= b  # type: ignore[no-any-return]
+    pass
 
 
 # "numeric emulation" methods definitions
@@ -65,93 +56,93 @@ def _ge(a: Any, b: Any) -> bool:
 
 @_xn
 def _add(a: Any, b: Any) -> Any:
-    return a + b
+    pass
 
 
 @_xn
 def _sub(a: Any, b: Any) -> Any:
-    return a - b
+    pass
 
 
 @_xn
 def _mul(a: Any, b: Any) -> Any:
-    return a * b
+    pass
 
 
 @_xn
 def _matmul(a: Any, b: Any) -> Any:
-    return a @ b
+    pass
 
 
 @_xn
 def _truediv(a: Any, b: Any) -> Any:
-    return a / b
+    pass
 
 
 @_xn
 def _floordiv(a: Any, b: Any) -> Any:
-    return a // b
+    pass
 
 
 @_xn
 def _mod(a: Any, b: Any) -> Any:
-    return a % b
+    pass
 
 
 @_xn
 def _divmod(a: Any, b: Any) -> Any:
-    return divmod(a, b)
+    pass
 
 
 @_xn
 def _pow(a: Any, b: Any) -> Any:
-    return pow(a, b)
+    pass
 
 
 @_xn
 def _lshift(a: Any, b: Any) -> Any:
-    return a << b
+    pass
 
 
 @_xn
 def _rshift(a: Any, b: Any) -> Any:
-    return a >> b
+    pass
 
 
 @_xn
 def _and(a: Any, b: Any) -> Any:
-    return a & b
+    pass
 
 
 @_xn
 def _xor(a: Any, b: Any) -> Any:
-    return a ^ b
+    pass
 
 
 @_xn
 def _or(a: Any, b: Any) -> Any:
-    return a | b
+    pass
 
 
 # unary operations
 @_xn
 def _neg(a: Any) -> Any:
-    return -a
+    pass
 
 
 @_xn
 def _pos(a: Any) -> Any:
-    return +a
+    pass
 
 
 @_xn
 def _abs(a: Any) -> Any:
-    return abs(a)
+    pass
 
 
 @_xn
 def _invert(a: Any) -> Any:
-    return ~a
+    pass
 
 
 # built ins
@@ -176,7 +167,7 @@ def reflected(operator: Callable[[Any, Any], Any]) -> Callable[[Any, Any], Any]:
     """Reflects an operator."""
 
     def inner_reflected(a: Any, b: Any) -> Any:
-        return operator(b, a)
+        pass
 
     return inner_reflected
 
